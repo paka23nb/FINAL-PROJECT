@@ -4,9 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Movies</title>
-    <link rel="stylesheet" href="/public/css/styles.css">
+    <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
     <p>Movies</p>
+    <div id="movie-list">
+        <h1>Movie List</h1>
+        <div class="mymovielist">
+            <ul>
+                {{#each movies}}
+                    <li>
+                        <h2>{{this.title}}</h2>
+                        <p>Director: {{this.author_id}}</p>
+                        <p>Release Year: {{this.release_year}}</p>
+                        <p>Genre: {{this.genre}}</p>
+                    </li>
+                {{/each}}
+            </ul>
+        </div>
+    </div>
 </body>
 </html>

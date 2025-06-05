@@ -1,3 +1,4 @@
+const { error } = require('console');
 const express = require('express');
 const fs=require('fs');
 const sqlite3 = require('sqlite3');
@@ -57,13 +58,15 @@ db.run(`
   } else {
     console.log("---> movies table created!");
 
+
+
     db.run(`
-      INSERT INTO movies (title, release_year, author_id) VALUES
-        ('Inception', 2010, 1),
-        ('Lady Bird', 2017, 2),
-        ('Parasite', 2019, 3),
-        ('E.T.', 1982, 4),
-        ('Pulp Fiction', 1994, 5)
+      INSERT INTO movies (title, release_year, author_id, genre) VALUES
+        ('Inception', 2010, 1, 'Sci-Fi'),
+        ('Lady Bird', 2017, 2, 'Drama'),
+        ('Parasite', 2019, 3, 'Thriller'),
+        ('E.T.', 1982, 4, 'Family'),
+        ('Pulp Fiction', 1994, 5, 'Crime')
     `, (err) => {
       if (err) {
         console.log(err.message);
@@ -87,7 +90,14 @@ app.listen(port, function () {
 
 
 app.get('/movies', function (req, res) {
-    res.render('movies.handlebars');
+  db.all('SELECT * FROM movies', (err, listOfMovies) => {
+    if (err) {
+      console.log("ERROR: ", err);
+    } else {
+      model = { movies: listOfMovies };
+      res.render('movies.handlebars', model);
+    }
+  });
 });
 
 app.get('/about', function (req, res) {
