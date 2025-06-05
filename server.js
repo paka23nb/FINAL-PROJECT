@@ -56,11 +56,13 @@ db.run(`
       }
     });
   }
-});
+})
 
+// PAGES
 
 app.get('/', function (req, res) {
-    res.sendFile(__dirname + '/views/index.html');
+    //res.sendFile(__dirname + '/views/layouts/main.handlebars');
+    res.render('home.handlebars')
 });
 
 app.listen(port, function () {
@@ -85,10 +87,22 @@ app.get('/listpersons', function (req, res) {
         } else {
             listPersonsHTML = '<ul>';
             rawPersons.forEach( function (onePerson) {
+                // Code provided by the copilot
                 listPersonsHTML += `<li>${onePerson.fname} ${onePerson.lname}, Age: ${onePerson.age}, Email: ${onePerson.email}</li>`;
             })
             listPersonsHTML += '</ul>';
             res.send(listPersonsHTML);
-        }
+        } 
     });
 });    
+
+app.get('/movies', function (req, res) {
+    res.render('movies.handlebars');
+});
+
+// HANDLEBARS
+const { engine } = require('express-handlebars');
+
+app.engine('handlebars', engine());
+app.set('view engine', 'handlebars');
+app.set('views', __dirname + '/views');
