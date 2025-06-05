@@ -100,6 +100,13 @@ app.get('/movies', function (req, res) {
     res.render('movies.handlebars');
 });
 
+app.get('/about', function (req, res) {
+    res.render('about.handlebars');
+});
+
+app.get('/contact', function (req, res) {
+    res.render('contact.handlebars');
+});
 // HANDLEBARS
 const { engine } = require('express-handlebars');
 
