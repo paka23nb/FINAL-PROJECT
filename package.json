@@ -10,8 +10,10 @@
   "description": "",
   "dependencies": {
     "bcrypt": "^6.0.0",
+    "connect-sqlite3": "^0.9.15",
     "express": "^5.1.0",
     "express-handlebars": "^8.0.1",
+    "express-session": "^1.18.1",
     "sqlite3": "^5.1.7"
   }
 }

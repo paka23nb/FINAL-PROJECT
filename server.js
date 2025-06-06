@@ -1,7 +1,7 @@
 // GLOBAL DEFINITIONS
 
-const adminName = 'admin';
-const adminPassword = 'admin123';
+const {adminName} = require('./hash.js'); //admin
+const {adminPassword} = require('./hash.js'); //admin123
 
 
 // PACKAGES
@@ -10,27 +10,24 @@ const { error } = require('console');
 const express = require('express');
 const fs=require('fs');
 const sqlite3 = require('sqlite3');
+const session = require('express-session');
+const app = express();
+const connectSqlite3 = require('connect-sqlite3');
 
 const port = 8080;
 
-const app = express();
 
 // BCRYPT
 const bcrypt = require('bcrypt');
-
 const saltRounds = 12;
 
+// HANDLEBARS
 
+const { engine } = require('express-handlebars');
 
-bcrypt.hash(adminPassword, saltRounds, function(err, hash) {
-  if (err) {
-    console.error("Error hashing password:", err);
-  } else {
-    console.log("Hashed password:", hash);
-  }
-});
-
-
+app.engine('handlebars', engine());
+app.set('view engine', 'handlebars');
+app.set('views', __dirname + '/views');
 
 // MIDDLEWARE
 
@@ -49,10 +46,26 @@ const { initTableMovies } = require(__dirname + '/data/dataMovies');
 initTableAuthors(db);
 initTableMovies(db);
 
-// ROUTES
+// SESSION
 
+const SQLiteStore = connectSqlite3(session);
+
+app.use(session({
+  store: new SQLiteStore({db: "session-db.db"}),
+  "saveUninitialized": false,
+  "resave": false,
+  "secret": "SomeSecretKey"
+}));
+
+// ROUTES
 app.get('/', function (req, res) {
-    res.render('home.handlebars')
+  const model = {
+    isLoggedIn: req.session.isLoggedIn,
+    name: req.session.name,
+    isAdmin: req.session.isAdmin
+  }
+  console.log("---> Home model: "+JSON.stringify(model));
+  res.render('home.handlebars', model);
 });
 
 app.listen(port, function () {
@@ -69,6 +82,21 @@ app.get('/movies', function (req, res) {
     }
   });
 });
+
+// code provied by copilot ---BEGIN
+app.get('/movies/:movieid', function (req, res) {
+  db.get("SELECT * FROM movies WHERE mid=?", [req.params.movieid], (error, theMovie) => {
+    if (error) {
+      console.log("ERROR: "+error)
+      return res.status(500).send("Database error");
+    }
+    if (!theMovie) {
+      return res.status(404).send("Movie not found");
+    }
+    res.render('movie.handlebars', { movie: theMovie });
+  });
+})
+// code provided by copilot ---END
 
 app.get('/authors', function (req, res) {
   db.all('SELECT * FROM authors', (err, rows) => {
@@ -92,58 +120,55 @@ app.get('/login', function (req, res) {
     res.render('login.handlebars');
 });
 
+app.get('/logout', function (req,res) {
+  req.session.destroy(() => {
+    res.redirect('/');
+  });
+})
+
 // LOGIN
 
+//This code was adapted from chatGPT ---BEGIN
+
 app.post('/login', function (req, res) {
-    const username = req.body.username;
-    const password = req.body.password;
+    const { username, password } = req.body;
+    console.log('BODY:', req.body);
 
     if (!username || !password) {
-        const model = { error: 'Username and password are required', message: 'Please enter both username and password.' };
-        return res.status(400).render('login.handlebars', { model });
+        return res.status(400).render('login.handlebars', {
+            error: 'Username and password are required',
+        });
     }
 
-    if (username == adminName) {
-      console.log('The username is admin!');
-      bcrypt.compare(password, adminPassword, (err, result) => {
-        if (err) {
-          const model = { error: 'Error comparing password' + err, message: 'Please try again later.' };
-          res.render('login.handlebars', model);
-        }
+    if (username === adminName) {
+        bcrypt.compare(password, adminPassword, (err, result) => {
+            if (err) {
+                return res.render('login.handlebars', {
+                    error: 'Error checking password',
+                });
+            }
 
-        if (result) {
-          console.log('The password is correct!');
-          const model = { error: "", message: 'Login successful!' };
-          res.render('login.handlebars', model);
-        } else {
-          const model = { error: 'Incorrect password', message: 'Try again.' };
-          res.status(400).render('login.handlebars', model);
-        } 
-      });
+            if (result) {
+                // Store the username in the session
+                req.session.isAdmin = true;
+                req.session.isLoggedIn = true;
+                req.session.name = username;
+                console.log("Session information: "+JSON.stringify(req.session));
 
-      /*
-      if (password == adminPassword) {
-        console.log('The password is correct!');
-        const model = { error: "", message: 'Login successful!' };
-        res.render('login.handlebars', model);
-      } else {
-        const model = { error: 'Incorrect password', message: 'Try again.' };
-        res.status(400).render('login.handlebars',  model);
-      }
-      */
+                message: "Login sucessful!";
+
+                res.redirect("/");
+            } else {
+                return res.render('login.handlebars', {
+                    error: 'Incorrect password',
+                });
+            }
+        });
     } else {
-      const model = { error: 'Incorrect username', message: 'Try again.' };
-      res.status(400).render('login.handlebars', model);
+        return res.render('login.handlebars', {
+            error: 'Incorrect username',
+        });
     }
 });
 
-
-
-// HANDLEBARS
-
-const { engine } = require('express-handlebars');
-
-app.engine('handlebars', engine());
-app.set('view engine', 'handlebars');
-app.set('views', __dirname + '/views');
-
+//This code was provided by chatGPT ---END

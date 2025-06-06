@@ -8,7 +8,7 @@ const movies = [
     mtitle: "Inception",
     mdesc: "A mind-bending thriller about dreams within dreams.",
     myear: 2010,
-    murl: "./img/inception.jpg",
+    murl: "/img/inception.jpg",
 
   },
   {
@@ -18,7 +18,7 @@ const movies = [
     mtitle: "Lady Bird",
     mdesc: "A heartfelt coming-of-age story set in Sacramento.",
     myear: 2017,
-    murl: "./img/ladybird.jpg",
+    murl: "/img/ladybird.jpg",
 
   },
   {
@@ -28,7 +28,7 @@ const movies = [
     mtitle: "Parasite",
     mdesc: "A dark social satire on class and survival.",
     myear: 2019,
-    murl: "./img/parasite.jpg",
+    murl: "/img/parasite.jpg",
  
   },
   {
@@ -38,7 +38,7 @@ const movies = [
     mtitle: "E.T.",
     mdesc: "A touching tale of friendship between a boy and an alien.",
     myear: 1982,
-    murl: "./img/et.jpg",
+    murl: "/img/et.jpg",
    
   },
   {
@@ -48,7 +48,7 @@ const movies = [
     mtitle: "Pulp Fiction",
     mdesc: "A stylish, nonlinear crime saga filled with iconic scenes.",
     myear: 1994,
-    murl: "./img/pulpfiction.jpg",
+    murl: "/img/pulpfiction.jpg",
     
   }
 ];
