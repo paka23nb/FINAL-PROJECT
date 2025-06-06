@@ -7,19 +7,18 @@
     <link rel="stylesheet" href="/public/css/styles.css">
 </head>
 <body>
-    <header>
-        <img src="/img/Banner.jpg" alt="Cinema Banner">
-        <h1>Welcome to Cinema City!</h1>
-        <nav>
-            <ul>
-                <li><a href="/">Home</a></li>
-                <li><a href="/movies">Movies</a></li>
-                <li><a href="/authors">Authors</a></li>
-                <li><a href="/about">About</a></li>
-                <li><a href="/contact">Contact</a></li>
-            </ul>
-        </nav>
-    </header>
+    <h1>Author List</h1>
+
+  <div class="author-list">
+    {{#each authors}}
+      <div class="author-card">
+        <h2>{{aname}}</h2>
+        <p><strong>Born:</strong> {{abirth}}</p>
+        <p><strong>Nationality:</strong> {{anation}}</p>
+        <img src="{{aimg}}" alt="{{aname}}" style="width:150px;">
+      </div>
+    {{/each}}
+  </div>
     
 </body>
 </html>
