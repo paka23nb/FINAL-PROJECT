@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="principal">
+        <h1>New Movie</h1>
+        <div class="mytextcard">
+            <form action="/movie/new" method="POST">
+                <label for="mtitle">Title:</label>
+                <input type="text" id="mtitle" name="mtitle" required="required"><br />
+
+                <label for="myear">Year:</label>
+                <input type="number" id="myear" name="myear" min="1900" max="2050" required="required"><br />
+
+                <label for="mdesc">Description:</label>
+                <textarea id="mdesc" name="mdesc" required="required"></textarea><br />
+
+                <label for="mtype">Genre:</label>
+                <select name="mtype" id="mtype">
+                    <option value="Action">Action</option>
+                    <option value="Comedy">Comedy</option>
+                    <option value="Drama">Drama</option>
+                    <option value="Sci-Fi">Sci-Fi</option>
+                </select><br />
+
+                <label for="murl">Image URL:</label>
+                <input type="text" id="murl" name="murl" placeholder="/img/movie-poster.png" required="required"><br />
+
+                <input type="submit" value="Create new movie" />
+
+            </form>
+        </div>
+    </div>
+</body>
+</html>

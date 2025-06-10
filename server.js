@@ -24,6 +24,7 @@ const saltRounds = 12;
 // HANDLEBARS
 
 const { engine } = require('express-handlebars');
+const { url } = require('inspector');
 
 app.engine('handlebars', engine());
 app.set('view engine', 'handlebars');
@@ -57,6 +58,11 @@ app.use(session({
   "secret": "SomeSecretKey"
 }));
 
+app.use((req, res, next) => {
+  res.locals.session = req.session;
+  next();
+});
+
 // ROUTES
 app.get('/', function (req, res) {
   const model = {
@@ -78,7 +84,16 @@ app.get('/movies', function (req, res) {
     if (err) {
       console.error("Error loading movies:", err.message);
     } else {
-      res.render('movies', { movies: rows });
+      res.render('movies', {
+        movies: rows,
+
+        // provided by copilot ---BEGIN
+        isLoggedIn: req.session.isLoggedIn,
+        name: req.session.name,
+        isAdmin: req.session.isAdmin,
+        session: req.session 
+        // ---END
+      });
     }
   });
 });
@@ -93,7 +108,12 @@ app.get('/movies/:movieid', function (req, res) {
     if (!theMovie) {
       return res.status(404).send("Movie not found");
     }
-    res.render('movie.handlebars', { movie: theMovie });
+    res.render('movie.handlebars', { 
+      movie: theMovie,
+    isLoggedIn: req.session.isLoggedIn,
+        name: req.session.name,
+        isAdmin: req.session.isAdmin,
+        session: req.session  });
   });
 })
 // code provided by copilot ---END
@@ -103,21 +123,41 @@ app.get('/authors', function (req, res) {
     if (err) {
       console.error("Error loading authors:", err.message);
     } else {
-      res.render('authors', { authors: rows });
+      res.render('authors', { authors: rows,
+        isLoggedIn: req.session.isLoggedIn,
+        name: req.session.name,
+        isAdmin: req.session.isAdmin,
+        session: req.session 
+       });
     }
   });
 });
 
 app.get('/about', function (req, res) {
-    res.render('about.handlebars');
+    res.render('about.handlebars', {
+      isLoggedIn: req.session.isLoggedIn,
+        name: req.session.name,
+        isAdmin: req.session.isAdmin,
+        session: req.session 
+    });
 });
 
 app.get('/contact', function (req, res) {
-    res.render('contact.handlebars');
+    res.render('contact.handlebars', {
+      isLoggedIn: req.session.isLoggedIn,
+        name: req.session.name,
+        isAdmin: req.session.isAdmin,
+        session: req.session 
+    });
 });
 
 app.get('/login', function (req, res) {
-    res.render('login.handlebars');
+    res.render('login.handlebars', {
+      isLoggedIn: req.session.isLoggedIn,
+        name: req.session.name,
+        isAdmin: req.session.isAdmin,
+        session: req.session 
+    });
 });
 
 app.get('/logout', function (req,res) {
@@ -125,6 +165,36 @@ app.get('/logout', function (req,res) {
     res.redirect('/');
   });
 })
+
+app.get('/movie/new', function (req, res) {
+  res.render('movie-new.handlebars');
+});
+
+// DELETE MOVIE
+app.get('/movie/delete/:movieid', function(req, res) {
+  console.log('Movie route parameter movieid:', +JSON.stringify(req.params.movieid));
+  db.run('DELETE FROM movies WHERE mid = ?', [req.params.movieid], (err, theMovie) => {
+    if(err) {
+      console.log('ERROR:'+ err)
+    } else {
+      console.log('The movie '+req.params.movieid+' was deleted');
+      res.redirect('/movies');
+    }
+  })
+});
+
+// NEW MOVIE
+app.post('/movie/new', function(req,res) {
+  const name = req.body.mtitle;
+  const year = req.body.myear;
+  const director = req.body.movieDirector;
+  const type = req.body.mdesc;
+  const desc = req.body.mdesc;
+  const url  = req.body.movieUrl;
+})
+
+
+
 
 // LOGIN
 

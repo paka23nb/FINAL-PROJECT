@@ -9,6 +9,10 @@
 <body>
     <h1>Movie List</h1>
 
+          {{#if session.isAdmin}}
+             <div><a href="/movie/new">New Movie</a></div>
+          {{/if}}
+
   <div class="movie-list">
     {{#each movies}}
       <div class="movie-card">
@@ -17,6 +21,11 @@
         <p>Year: {{myear}}</p>
         <p>{{mdesc}}</p>
         <img src="{{murl}}" alt="Movie Image" style="width:200px;">
+        {{#if ../session.isAdmin}}
+        <br>
+          <a href="/movie/modify/{{mid}}" class="modify">modify</a>
+          <a href="/movie/delete/{{mid}}" class="delete">delete</a>
+        {{/if}}
       </div>
     {{/each}}
   </div>
