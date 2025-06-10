@@ -26,7 +26,13 @@ const saltRounds = 12;
 const { engine } = require('express-handlebars');
 const { url } = require('inspector');
 
-app.engine('handlebars', engine());
+app.engine('handlebars', 
+  engine({
+    helpers: {
+      eq (a, b) {return a == b; }
+    }
+  })
+);
 app.set('view engine', 'handlebars');
 app.set('views', __dirname + '/views');
 
@@ -44,8 +50,8 @@ const db = new sqlite3.Database(dbFile);
 const { initTableAuthors } = require(__dirname + '/data/dataAuthors');
 const { initTableMovies } = require(__dirname + '/data/dataMovies');
 
-initTableAuthors(db);
-initTableMovies(db);
+//initTableAuthors(db);
+//initTableMovies(db);
 
 // SESSION
 
@@ -73,11 +79,6 @@ app.get('/', function (req, res) {
   console.log("---> Home model: "+JSON.stringify(model));
   res.render('home.handlebars', model);
 });
-
-app.listen(port, function () {
-    console.log(`Server is up and running, listening on port ${port}`);
-});
-
 
 app.get('/movies', function (req, res) {
   db.all('SELECT * FROM movies', (err, rows) => {
@@ -187,12 +188,63 @@ app.get('/movie/delete/:movieid', function(req, res) {
 app.post('/movie/new', function(req,res) {
   const name = req.body.mtitle;
   const year = req.body.myear;
-  const director = req.body.movieDirector;
   const type = req.body.mdesc;
   const desc = req.body.mdesc;
-  const url  = req.body.movieUrl;
+  const url  = req.body.murl;
+  db.run('INSERT INTO movies (mtitle, myear, mtype, mdesc, murl) VALUES (?, ?, ?, ?, ?)', [name, year, type, desc, url], (error)  => {
+    if (error) {
+      console.error("ERROR:", error);
+      res.redirect('/movies');
+    } else {
+      console.log('Added!');
+      res.redirect('/movies');
+    }
+  });
 })
 
+// MODIFY MOVIE
+
+
+app.post('/movie/modify/:movieid', function (req, res) {
+    const id = req.params.movieid; 
+
+    const title = req.body.mtitle;
+    const year = req.body.myear;
+    const desc = req.body.mdesc;
+    const genre = req.body.mtype;
+    const url = req.body.murl;
+    
+    db.run(`UPDATE movies
+            SET mtitle = ?,
+                myear = ?,
+                mdesc = ?,
+                mtype = ?,
+                murl = ?
+            WHERE mid = ?`, 
+            [title, year, desc, genre, url, id], 
+            (error) => {
+                if (error) {
+                    console.log("ERROR: ", error);
+                    res.redirect('/movies');
+                } else {
+                    res.redirect('/movies');
+                }
+            });
+});
+
+
+app.get('/movie/modify/:movieid', function(req,res) {
+   const id = req.params.movieid
+   db.get('SELECT * FROM movies WHERE mid = ?', [id], (error, theMovie) => {
+    if (error) {
+      console.log('ERROR:', error);
+      res.redirect('/movies');
+    } else {
+      model = { movie: theMovie }
+      res.render('movie-new.handlebars', model)
+    }
+   })
+})
 
 
 
@@ -242,3 +294,21 @@ app.post('/login', function (req, res) {
 });
 
 //This code was provided by chatGPT ---END
+
+// 404 ERROR
+
+app.use(function (req,res)  {
+  res.status(404).render('404.handlebars');
+})
+
+// 500 ERROR
+
+app.use(function (err, req, res, next) {
+  console.error(err.stack);
+  res.status(500).render('500');
+});
+
+// LISTENING
+app.listen(port, function () {
+    console.log(`Server is up and running, listening on port ${port}`);
+});

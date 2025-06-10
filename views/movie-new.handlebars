@@ -6,34 +6,47 @@
     <title>Document</title>
 </head>
 <body>
+    <main>
     <div id="principal">
-        <h1>New Movie</h1>
+        {{#if movie.mid}} <h1>Modify movie</h1> {{else}} <h1>New movie</h1> {{/if}}
+
         <div class="mytextcard">
+            {{#if movie.mid}}
+            <form action="/movie/modify/{{movie.mid}}" method="POST">
+            {{else}}
             <form action="/movie/new" method="POST">
-                <label for="mtitle">Title:</label>
-                <input type="text" id="mtitle" name="mtitle" required="required"><br />
+            {{/if}}
 
-                <label for="myear">Year:</label>
-                <input type="number" id="myear" name="myear" min="1900" max="2050" required="required"><br />
+            <label for="mtitle">Title:</label>
+            <input type="text" id="mtitle" name="mtitle" required="required"
+            {{#if movie.mtitle}} value="{{movie.mtitle}}" {{/if}}
+            ><br />
 
-                <label for="mdesc">Description:</label>
-                <textarea id="mdesc" name="mdesc" required="required"></textarea><br />
+            <label for="myear">Year:</label>
+            <input type="number" id="myear" name="myear" min="1900" max="2050" required="required"
+            {{#if movie.myear}} value="{{movie.myear}}" {{/if}}
+            ><br />
 
-                <label for="mtype">Genre:</label>
-                <select name="mtype" id="mtype">
-                    <option value="Action">Action</option>
-                    <option value="Comedy">Comedy</option>
-                    <option value="Drama">Drama</option>
-                    <option value="Sci-Fi">Sci-Fi</option>
-                </select><br />
+            <label for="mdesc">Description:</label>
+            <textarea id="mdesc" name="mdesc" required="required">{{#if movie.mdesc}}{{movie.mdesc}}{{/if}}</textarea><br />
 
-                <label for="murl">Image URL:</label>
-                <input type="text" id="murl" name="murl" placeholder="/img/movie-poster.png" required="required"><br />
+            <label for="mtype">Genre:</label>
+            <select name="mtype" id="mtype">
+                <option value="Action" {{#if (eq movie.mtype "Action")}}selected="selected"{{/if}}>Action</option>
+                <option value="Comedy" {{#if (eq movie.mtype "Comedy")}}selected="selected"{{/if}}>Comedy</option>
+                <option value="Drama" {{#if (eq movie.mtype "Drama")}}selected="selected"{{/if}}>Drama</option>
+                <option value="Sci-Fi" {{#if (eq movie.mtype "Sci-Fi")}}selected="selected"{{/if}}>Sci-Fi</option>
+            </select><br />
 
-                <input type="submit" value="Create new movie" />
+            <label for="murl">Image URL:</label>
+            <input type="text" id="murl" name="murl" placeholder="/img/movie-poster.png" required="required"
+            {{#if movie.mimgURL}} value="{{movie.mimgURL}}" {{/if}}
+            ><br />
 
+            <input type="submit" value="{{#if movie.mid}}Modify movie{{else}}Create new movie{{/if}}" />
             </form>
         </div>
     </div>
+    </main>
 </body>
 </html>
